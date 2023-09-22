@@ -1,0 +1,408 @@
+-- create
+CREATE TABLE Cliente (
+    IdCliente INT AUTO_INCREMENT NOT NULL,
+    NombreCliente VARCHAR(150) NOT NULL,
+    Apellido VARCHAR(150) NOT NULL,
+    Edad INT(2) NOT NULL, 
+    DireccionCliente VARCHAR(250),
+    TelefonoCliente VARCHAR(12),
+    PRIMARY KEY (IdCliente)
+);
+
+CREATE TABLE Categoria (
+    IdCategoria INT AUTO_INCREMENT NOT NULL,
+    NombreCategoria VARCHAR(250),
+    PRIMARY KEY (IdCategoria)
+);
+
+CREATE TABLE Producto (
+    IdProducto INT AUTO_INCREMENT NOT NULL,
+    IdCategoria INT NOT NULL,
+    NombreProducto VARCHAR(250),
+    Descripcion VARCHAR(250),
+    Disponibilidad ENUM('EN_EXISTENCIA', 'AGOTADO'),
+    PRIMARY KEY (IdProducto),
+    FOREIGN KEY (IdCategoria) REFERENCES Categoria(IdCategoria)
+);
+
+CREATE TABLE Inventario (
+    IdInventario INT AUTO_INCREMENT NOT NULL,
+    IdProducto INT,
+    FechaInventario DATE,
+    CantidadProducto INT,
+    Disponibilidad ENUM('EN_EXISTENCIA', 'AGOTADO'),
+    PRIMARY KEY(IdInventario),
+    FOREIGN KEY(IdProducto) REFERENCES Producto(IdProducto)
+);   
+
+CREATE TABLE MetodoPago (
+    IdMetodoPago INT AUTO_INCREMENT NOT NULL,
+    MonedaPago ENUM('Bolívares', 'Dólares', 'Euros', 'Pesos'),
+    TipoPago ENUM('Efectivo', 'Tarjeta_Debito', 'Tarjeta_Credito', 'Transferencia_Nacional', 'Pago_Movil', 'PayPal', 'Zelle'),
+    PRIMARY KEY(IdMetodoPago)
+);
+
+CREATE TABLE Sede (
+    IdSede INT AUTO_INCREMENT NOT NULL,
+    NombreSede VARCHAR(255),
+    UbicacionSede VARCHAR(255),
+    PRIMARY KEY(IdSede)
+);
+
+CREATE TABLE Venta (
+    IdVenta INT AUTO_INCREMENT NOT NULL,
+    FechaVenta DATE,
+    IdCliente INT NOT NULL,
+    NombreCliente VARCHAR (250),
+    DirecciónCliente VARCHAR (250),
+    IdProducto INT NOT NULL,
+    Cantidad INT,
+    Monto FLOAT (10,2),
+    IdMetodoPago INT NOT NULL,
+    IdSede INT NOT NULL,
+    IdGarantia INT NOT NULL,
+    PRIMARY KEY (IdVenta),
+    FOREIGN KEY (IdCliente) REFERENCES Cliente(IdCliente),
+    FOREIGN KEY (IdProducto) REFERENCES Producto(IdProducto),
+    FOREIGN KEY (IdMetodoPago) REFERENCES MetodoPago(IdMetodoPago),
+    FOREIGN KEY (IdSede) REFERENCES Sede(IdSede)
+);
+
+CREATE TABLE Garantia (
+    IdGarantia INT AUTO_INCREMENT NOT NULL,
+    IdProducto INT NOT NULL,
+    TiempoDuracion INT NOT NULL,
+    Descripción VARCHAR (250),
+    PRIMARY KEY (IdGarantia),
+    FOREIGN KEY (IdProducto) REFERENCES Producto(IdProducto)
+);
+    
+CREATE TABLE ArticuloEnRevision (
+    IdArticulo INT AUTO_INCREMENT NOT NULL,
+    IdProducto INT,
+    FechaEntrada DATE,
+    FechaSalida DATE,
+    DiagnosticoArticulo VARCHAR(250),
+    Estado ENUM('GARANTIA', 'REVISION'),
+    PRIMARY KEY(IdArticulo),
+    FOREIGN KEY(IdProducto) REFERENCES Producto(IdProducto)
+);
+
+CREATE TABLE Devolucion (
+    IdDevolucion INT AUTO_INCREMENT NOT NULL,
+    FechaDevolucion DATE,
+    IdVenta INT NOT NULL,
+    IdProducto INT NOT NULL,
+    MotivoDevolucion VARCHAR(250),
+    PRIMARY KEY(IdDevolucion),
+    FOREIGN KEY (IdProducto) REFERENCES Producto(IdProducto),
+    FOREIGN KEY (IdVenta) REFERENCES Venta (IdVenta)
+);
+
+-- Insertar registros en Cliente
+INSERT INTO Cliente (NombreCliente, Apellido, Edad, DireccionCliente, TelefonoCliente)
+VALUES
+    ('Juan', 'Pérez', 30, 'Calle A', 04125678954),
+    ('María', 'González', 25, 'Calle B', 04148765432),
+    ('Carlos', 'Rodríguez', 28, 'Calle C', 04265555532),
+    ('Ana', 'Martínez', 22, 'Avenida X', 04161111222),
+    ('Luis', 'López', 21, 'Calle Y', 04244444555),
+    ('Laura', 'Fernández', 29, 'Calle Z', 04247777888),
+    ('Pedro', 'Ramírez', 27, 'Avenida A', 04161234888),
+    ('Isabel', 'Santos', 24, 'Calle B', 04269999666),
+    ('Miguel', 'Díaz', 31, 'Avenida C', 04145555777),
+    ('Sofía', 'Hernández', 23, 'Calle D', 04128888444),
+    ('Andrés', 'Torres', 26, 'Avenida E', 04123333666),
+    ('Julia', 'Ortega', 32, 'Calle F', 04141111337),
+    ('Diego', 'Lara', 29, 'Avenida G', 04269999222),
+    ('Valentina', 'Sánchez', 25, 'Calle H', 04164448886),
+    ('Ricardo', 'Gómez', 19, 'Avenida I', 04247777666),
+    ('Camila', 'Pérez', 28, 'Calle J', 04268888222),
+    ('Manuel', 'Rodríguez', 34, 'Avenida K', 04145559999),
+    ('Martina', 'Fernández', 20, 'Calle L', 04123333444),
+    ('Javier', 'Martínez', 30, 'Avenida M', 04141111999),
+    ('Valeria', 'Santos', 26, 'Calle N', 04269999114),
+    ('Lorenzo', 'Díaz', 23, 'Avenida O', 04244444773),
+    ('Isabella', 'Hernández', 31, 'Calle P', 04167773333),
+    ('Emilio', 'Torres', 25, 'Avenida Q', 04268888332),
+    ('Renata', 'Ortega', 32, 'Calle R', 04145555338),
+    ('Jesus', 'Quintero', 18, 'Su Casa', 04243212123);
+    
+-- Insertar registros en Categoria
+INSERT INTO Categoria (NombreCategoria)
+VALUES
+    ('Computadoras'),
+    ('Equipos electronicos');
+    
+-- Insertar registros en Producto
+INSERT INTO Producto (IdCategoria, NombreProducto, Descripcion, Disponibilidad)
+VALUES
+    (1, 'Laptop HP', 'Laptop HP con procesador Intel Core i5', 'EN_EXISTENCIA'),
+    (1, 'Monitor ASUS', 'Monitor ASUS de 24 pulgadas', 'EN_EXISTENCIA'),
+    (1, 'Teclado Logitech', 'Teclado inalámbrico Logitech', 'EN_EXISTENCIA'),
+    (1, 'Mouse Microsoft', 'Mouse óptico Microsoft', 'EN_EXISTENCIA'),
+    (1, 'Impresora Epson', 'Impresora láser Epson', 'EN_EXISTENCIA'),
+    (1, 'Laptop Dell', 'Laptop Dell con procesador Intel Core i7', 'AGOTADO'),
+    (1, 'Monitor LG', 'Monitor LG de 27 pulgadas', 'EN_EXISTENCIA'),
+    (1, 'Teclado HP', 'Teclado inalámbrico HP', 'AGOTADO'),
+    (1, 'Mouse Logitech', 'Mouse óptico Logitech', 'EN_EXISTENCIA'),
+    (2, 'Impresora Canon', 'Impresora láser Canon', 'AGOTADO'),
+    (1, 'Laptop Lenovo', 'Laptop Lenovo con procesador AMD Ryzen 5', 'EN_EXISTENCIA'),
+    (1, 'Monitor Acer', 'Monitor Acer de 22 pulgadas', 'EN_EXISTENCIA'),
+    (1, 'Teclado Dell', 'Teclado inalámbrico Dell', 'AGOTADO'),
+    (1, 'Mouse HP', 'Mouse óptico HP', 'EN_EXISTENCIA'),
+    (2, 'Impresora Brother', 'Impresora láser Brother', 'EN_EXISTENCIA'),
+    (1, 'Laptop ASUS', 'Laptop ASUS con procesador Intel Core i5', 'AGOTADO'),
+    (1, 'Monitor Samsung', 'Monitor Samsung de 32 pulgadas', 'EN_EXISTENCIA'),
+    (1, 'Teclado Logitech', 'Teclado inalámbrico Logitech', 'EN_EXISTENCIA'),
+    (1, 'Mouse Microsoft', 'Mouse óptico Microsoft', 'AGOTADO'),
+    (2, 'Impresora HP', 'Impresora láser HP', 'EN_EXISTENCIA'),
+    (1, 'Laptop Acer', 'Laptop Acer con procesador AMD Ryzen 7', 'EN_EXISTENCIA'),
+    (1, 'Monitor Dell', 'Monitor Dell de 23 pulgadas', 'AGOTADO'),
+    (1, 'Teclado ASUS', 'Teclado inalámbrico ASUS', 'EN_EXISTENCIA'),
+    (1, 'Mouse Logitech', 'Mouse óptico Logitech', 'AGOTADO'),
+    (2, 'Impresora Epson', 'Impresora láser Epson', 'EN_EXISTENCIA');
+    
+-- Insertar registros en Inventario
+INSERT INTO Inventario (IdInventario, IdProducto, CantidadProducto, Disponibilidad)
+VALUES
+    (1, 1, 100, 'EN_EXISTENCIA'),
+    (2, 2, 50, 'EN_EXISTENCIA'),
+    (3, 3, 75, 'EN_EXISTENCIA'),
+    (4, 4, 60, 'EN_EXISTENCIA'),
+    (5, 5, 80, 'EN_EXISTENCIA'),
+    (6, 6, 40, 'EN_EXISTENCIA'),
+    (7, 7, 90, 'EN_EXISTENCIA'),
+    (8, 8, 55, 'EN_EXISTENCIA'),
+    (9, 9, 70, 'EN_EXISTENCIA'),
+    (10, 10, 45, 'EN_EXISTENCIA'),
+    (11, 11, 85, 'EN_EXISTENCIA'),
+    (12, 12, 30, 'EN_EXISTENCIA'),
+    (13, 13, 65, 'EN_EXISTENCIA'),
+    (14, 14, 95, 'EN_EXISTENCIA'),
+    (15, 15, 20, 'EN_EXISTENCIA'),
+    (16, 16, 75, 'EN_EXISTENCIA'),
+    (17, 17, 50, 'EN_EXISTENCIA'),
+    (18, 18, 70, 'EN_EXISTENCIA'),
+    (19, 19, 40, 'EN_EXISTENCIA'),
+    (20, 20, 60, 'EN_EXISTENCIA'),
+    (21, 21, 85, 'EN_EXISTENCIA'),
+    (22, 22, 30, 'EN_EXISTENCIA'),
+    (23, 23, 90, 'EN_EXISTENCIA'),
+    (24, 24, 55, 'EN_EXISTENCIA'),
+    (25, 25, 65, 'EN_EXISTENCIA');
+
+-- Insertar métodos de pago
+INSERT INTO MetodoPago (MonedaPago, TipoPago)
+VALUES
+    ('Bolívares', 'Efectivo'),
+    ('Bolívares', 'Tarjeta_Debito'),
+    ('Dólares', 'Tarjeta_Credito'),
+    ('Dólares', 'Transferencia_Nacional'),
+    ('Euros', 'Pago_Movil'),
+    ('Euros', 'PayPal'),
+    ('Pesos', 'Zelle');   
+
+-- Insertar sedes  
+INSERT INTO Sede (NombreSede, UbicacionSede)
+VALUES
+    ('La Candelaria Norte', 'Dirección de Candelaria Norte'),
+    ('La Candelaria Este', 'Dirección de Candelaria Sur'),
+    ('Los 2 Caminos', 'Dirección de Los Dos Caminos'),
+    ('Sambil Chacao', 'Dirección de Sambil Chacao'),
+    ('City Market', 'Dirección de City Market');
+    
+-- Insertar registros en Venta (desde el 5 de agosto de 2023)
+INSERT INTO Venta (IdVenta, IdCliente, IdMetodoPago, FechaVenta, Monto, IdProducto, NombreCliente, DirecciónCliente, IdSede, IdGarantia, Cantidad)
+VALUES
+    (1, 1, 1, '2023-08-05', 1500.00, 1, 'Juan Pérez', 'Calle A', 1, 1, 1),
+    (2, 2, 2, '2023-08-06', 1200.00, 2, 'María González', 'Calle B', 2, 2, 2),
+    (3, 3, 3, '2023-08-07', 800.00, 3, 'Carlos Rodríguez', 'Calle C', 3, 3, 3),
+    (4, 4, 4, '2023-08-08', 600.00, 4, 'Ana Martínez', 'Avenida X', 4, 4, 4),
+    (5, 5, 5, '2023-08-09', 950.00, 5, 'Luis López', 'Calle Y', 5, 5, 5),
+    (6, 6, 6, '2023-08-10', 750.00, 6, 'Laura Fernández', 'Calle Z', 1, 6, 6),
+    (7, 7, 7, '2023-08-11', 320.00, 7, 'Pedro Ramírez', 'Avenida A', 2, 7, 7),
+    (8, 8, 3, '2023-08-12', 280.00, 8, 'Isabel Santos', 'Calle B', 3, 8, 8),
+    (9, 9, 2, '2023-08-13', 650.00, 9, 'Miguel Díaz', 'Avenida C', 4, 9, 9),
+    (10, 10, 1, '2023-08-14', 450.00, 10, 'Sofía Hernández', 'Calle D', 5, 10, 10),
+    (11, 11, 1, '2023-08-15', 750.00, 11, 'Andrés Torres', 'Avenida E', 1, 11, 11),
+    (12, 12, 2, '2023-08-16', 890.00, 12, 'Julia Ortega', 'Calle F', 2, 12, 12),
+    (13, 13, 3, '2023-08-17', 420.00, 13, 'Diego Lara', 'Avenida G', 3, 13, 13),
+    (14, 14, 4, '2023-08-18', 1100.00, 14, 'Valentina Sánchez', 'Calle H', 4, 14, 14),
+    (15, 15, 5, '2023-08-19', 680.00, 15, 'Ricardo Gómez', 'Avenida I', 5, 15, 15),
+    (16, 16, 6, '2023-08-20', 540.00, 16, 'Camila Pérez', 'Calle J', 1, 16, 16),
+    (17, 17, 7, '2023-08-21', 970.00, 17, 'Manuel Rodríguez', 'Avenida K', 2, 17, 17),
+    (18, 18, 6, '2023-08-22', 730.00, 18, 'Martina Fernández', 'Calle L', 3, 18, 18),
+    (19, 19, 5, '2023-08-23', 520.00, 19, 'Javier Martínez', 'Avenida M', 4, 19, 19),
+    (20, 20, 3, '2023-08-24', 880.00, 20, 'Valeria Santos', 'Calle N', 5, 20, 20),
+    (21, 21, 1, '2023-08-25', 400.00, 21, 'Lorenzo Díaz', 'Avenida O', 1, 21, 21),
+    (22, 22, 2, '2023-08-26', 760.00, 22, 'Isabella Hernández', 'Calle P', 2, 22, 22),
+    (23, 23, 3, '2023-08-27', 590.00, 23, 'Emilio Torres', 'Avenida Q', 3, 23, 23),
+    (24, 24, 4, '2023-08-28', 950.00, 24, 'Renata Ortega', 'Calle R', 4, 24, 24),
+    (25, 25, 5, '2023-08-29', 850.00, 25, 'Lucas Sánchez', 'Avenida S', 5, 25, 25),
+    (26, 1, 6, '2023-08-30', 680.00, 1, 'Juan Pérez', 'Calle A', 1, 26, 26),
+    (27, 2, 7, '2023-08-31', 540.00, 2, 'María González', 'Calle B', 2, 27, 27),
+    (28, 3, 3, '2023-09-01', 970.00, 3, 'Carlos Rodríguez', 'Calle C', 3, 28, 28),
+    (29, 4, 4, '2023-09-02', 730.00, 4, 'Ana Martínez', 'Avenida X', 4, 29, 29),
+    (30, 5, 2, '2023-09-03', 520.00, 5, 'Luis López', 'Calle Y', 5, 30, 30),
+    (31, 6, 1, '2023-09-04', 880.00, 6, 'Laura Fernández', 'Calle Z', 1, 31, 31),
+    (32, 7, 2, '2023-09-05', 400.00, 7, 'Pedro Ramírez', 'Avenida A', 2, 32, 32),
+    (33, 8, 3, '2023-09-06', 760.00, 8, 'Isabel Santos', 'Calle B', 3, 33, 33),
+    (34, 9, 4, '2023-09-07', 590.00, 9, 'Miguel Díaz', 'Avenida C', 4, 34, 34),
+    (35, 10, 5, '2023-09-08', 950.00, 10, 'Sofía Hernández', 'Calle D', 5, 35, 35),
+    (36, 11, 6, '2023-09-09', 850.00, 11, 'Andrés Torres', 'Avenida E', 1, 36, 36),
+    (37, 12, 7, '2023-09-10', 680.00, 12, 'Julia Ortega', 'Calle F', 2, 37, 37),
+    (38, 13, 7, '2023-09-11', 540.00, 13, 'Diego Lara', 'Avenida G', 3, 38, 38),
+    (39, 14, 4, '2023-09-12', 970.00, 14, 'Valentina Sánchez', 'Calle H', 4, 39, 39),
+    (40, 15, 2, '2023-09-13', 730.00, 15, 'Ricardo Gómez', 'Avenida I', 5, 40, 40),
+    (41, 16, 1, '2023-09-14', 520.00, 16, 'Camila Pérez', 'Calle J', 1, 41, 41),
+    (42, 17, 2, '2023-09-15', 880.00, 17, 'Manuel Rodríguez', 'Avenida K', 2, 42, 42),
+    (43, 18, 3, '2023-09-16', 400.00, 18, 'Martina Fernández', 'Calle L', 3, 43, 43),
+    (44, 19, 4, '2023-09-17', 760.00, 19, 'Javier Martínez', 'Avenida M', 4, 44, 44),
+    (45, 20, 5, '2023-09-18', 590.00, 20, 'Valeria Santos', 'Calle N', 5, 45, 45),
+    (46, 21, 6, '2023-09-19', 950.00, 21, 'Lorenzo Díaz', 'Avenida O', 1, 46, 46),
+    (47, 22, 7, '2023-09-20', 850.00, 22, 'Isabella Hernández', 'Calle P', 2, 47, 47),
+    (48, 23, 1, '2023-09-21', 680.00, 23, 'Emilio Torres', 'Avenida Q', 3, 48, 48),
+    (49, 24, 5, '2023-09-22', 540.00, 24, 'Renata Ortega', 'Calle R', 4, 49, 49),
+    (50, 25, 6, '2023-09-23', 970.00, 25, 'Lucas Sánchez', 'Avenida S', 5, 50, 50);
+
+INSERT INTO Garantia (IdGarantia, IdProducto, TiempoDuracion, Descripción)
+VALUES
+    (1, 1, 60, 'Garantía estándar'),
+    (2, 2, 365, 'Garantía extendida'),
+    (3, 3, 30, 'Garantía básica'),
+    (4, 4, 90, 'Garantía premium'),
+    (5, 5, 60, 'Garantía estándar'),
+    (6, 6, 365, 'Garantía extendida'),
+    (7, 7, 30, 'Garantía básica'),
+    (8, 8, 90, 'Garantía premium'),
+    (9, 9, 60, 'Garantía estándar'),
+    (10, 10, 365, 'Garantía extendida'),
+    (11, 11, 30, 'Garantía básica'),
+    (12, 12, 90, 'Garantía premium'),
+    (13, 13, 60, 'Garantía estándar'),
+    (14, 14, 365, 'Garantía extendida'),
+    (15, 15, 30, 'Garantía básica'),
+    (16, 16, 90, 'Garantía premium'),
+    (17, 17, 60, 'Garantía estándar'),
+    (18, 18, 365, 'Garantía extendida'),
+    (19, 19, 30, 'Garantía básica'),
+    (20, 20, 90, 'Garantía premium'),
+    (21, 21, 60, 'Garantía estándar'),
+    (22, 22, 365, 'Garantía extendida'),
+    (23, 23, 30, 'Garantía básica'),
+    (24, 24, 90, 'Garantía premium'),
+    (25, 25, 60, 'Garantía estándar');
+    
+    
+-- Insertar registros en ArticuloEnRevision (25 registros)
+INSERT INTO ArticuloEnRevision (IdProducto, FechaEntrada, FechaSalida, DiagnosticoArticulo, Estado)
+VALUES
+    (1, '2023-08-10', '2023-08-15', 'Reparación de pantalla', 'GARANTIA'),
+    (2, '2023-08-11', '2023-08-16', 'Actualización de software', 'REVISION'),
+    (3, '2023-08-12', '2023-08-17', 'Reemplazo de batería', 'GARANTIA'),
+    (4, '2023-08-13', '2023-08-18', 'Limpieza interna', 'REVISION'),
+    (5, '2023-08-14', '2023-08-19', 'Reparación de teclado', 'GARANTIA'),
+    (6, '2023-08-15', '2023-08-20', 'Actualización de firmware', 'REVISION'),
+    (7, '2023-08-16', '2023-08-21', 'Reparación de pantalla táctil', 'GARANTIA'),
+    (8, '2023-08-17', '2023-08-22', 'Diagnóstico de hardware', 'REVISION'),
+    (9, '2023-08-18', '2023-08-23', 'Reparación de placa madre', 'GARANTIA'),
+    (10, '2023-08-19', '2023-08-24', 'Actualización de controladores', 'REVISION'),
+    (11, '2023-08-20', '2023-08-25', 'Reparación de disco duro', 'GARANTIA'),
+    (12, '2023-08-21', '2023-08-26', 'Limpieza de ventiladores', 'REVISION'),
+    (13, '2023-08-22', '2023-08-27', 'Reparación de tarjeta gráfica', 'GARANTIA'),
+    (14, '2023-08-23', '2023-08-28', 'Actualización de memoria RAM', 'REVISION'),
+    (15, '2023-08-24', '2023-08-29', 'Reparación de conector USB', 'GARANTIA'),
+    (16, '2023-08-25', '2023-08-30', 'Reemplazo de unidad de disco', 'REVISION'),
+    (17, '2023-08-26', '2023-08-31', 'Reparación de tarjeta de red', 'GARANTIA'),
+    (18, '2023-08-27', '2023-09-01', 'Actualización de BIOS', 'REVISION'),
+    (19, '2023-08-28', '2023-09-02', 'Reparación de fuente de poder', 'GARANTIA'),
+    (20, '2023-08-29', '2023-09-03', 'Limpieza de sistema de enfriamiento', 'REVISION'),
+    (21, '2023-08-30', '2023-09-04', 'Reparación de tarjeta de sonido', 'GARANTIA'),
+    (22, '2023-08-31', '2023-09-05', 'Reemplazo de unidad óptica', 'REVISION'),
+    (23, '2023-09-01', '2023-09-06', 'Actualización de sistema operativo', 'GARANTIA'),
+    (24, '2023-09-02', '2023-09-07', 'Reparación de puertos HDMI', 'REVISION'),
+    (25, '2023-09-03', '2023-09-08', 'Reemplazo de tarjeta madre', 'GARANTIA');
+    
+-- Insertar registros en Devolucion (25 registros)
+INSERT INTO Devolucion (IdDevolucion, IdProducto, FechaDevolucion, MotivoDevolucion, IdVenta)
+VALUES
+    (1, 1, '2023-08-10', 'Producto defectuoso', 1),
+    (2, 2, '2023-08-12', 'Producto no deseado', 2),
+    (3, 3, '2023-08-15', 'Producto dañado en tránsito', 3),
+    (4, 4, '2023-08-20', 'Producto incorrecto', 4),
+    (5, 5, '2023-08-25', 'Producto defectuoso', 5),
+    (6, 6, '2023-08-28', 'Producto no deseado', 6),
+    (7, 7, '2023-08-30', 'Producto dañado en tránsito', 7),
+    (8, 8, '2023-09-02', 'Producto incorrecto', 8),
+    (9, 9, '2023-09-05', 'Producto defectuoso', 9),
+    (10, 10, '2023-09-08', 'Producto no deseado', 10);
+    
+    
+-- Los 15 productos más vendidos en general
+SELECT p.NombreProducto, SUM(v.Cantidad) AS TotalVendido
+FROM Venta v
+JOIN Producto p ON v.IdProducto = p.IdProducto
+GROUP BY p.NombreProducto
+ORDER BY TotalVendido DESC
+LIMIT 15;
+
+
+-- Los 5 productos más vendidos por categoría
+SELECT c.NombreCategoria AS Categoria, p.NombreProducto, SUM(v.Cantidad) AS TotalVendido
+FROM Venta v
+JOIN Producto p ON v.IdProducto = p.IdProducto
+JOIN Categoria c ON p.IdCategoria = c.IdCategoria
+GROUP BY c.NombreCategoria, p.NombreProducto
+ORDER BY c.NombreCategoria, TotalVendido DESC
+LIMIT 5;
+
+-- Total de cada producto vendido
+SELECT p.NombreProducto, SUM(v.Cantidad) AS TotalVendido
+FROM Venta v
+JOIN Producto p ON v.IdProducto = p.IdProducto
+GROUP BY p.NombreProducto;
+
+-- Promedio mensual de ventas de cada producto
+SELECT p.NombreProducto, 
+       YEAR(FechaVenta) AS Año, 
+       MONTH(FechaVenta) AS Mes, 
+       AVG(v.Cantidad) AS PromedioMensual
+FROM Venta v
+JOIN Producto p ON v.IdProducto = p.IdProducto
+GROUP BY p.NombreProducto, Año, Mes;
+
+-- Método de pago más usado
+SELECT TipoPago, COUNT(*) AS CantidadUsos
+FROM MetodoPago
+GROUP BY TipoPago
+ORDER BY CantidadUsos DESC
+LIMIT 1;
+
+-- Método de pago menos usado
+SELECT TipoPago, COUNT(*) AS CantidadUsos
+FROM MetodoPago
+GROUP BY TipoPago
+ORDER BY CantidadUsos ASC
+LIMIT 1;
+
+-- Detalle de clientes por ventas organizados por fechas
+SELECT c.NombreCliente, v.FechaVenta
+FROM Cliente c
+JOIN Venta v ON c.IdCliente = v.IdCliente
+ORDER BY v.FechaVenta;
+
+-- Los 5 productos que ingresan nuevamente por garantía o revisión
+SELECT a.NombreProducto, ar.DiagnosticoArticulo
+FROM ArticuloEnRevision ar
+JOIN Producto a ON ar.IdProducto = a.IdProducto
+WHERE ar.Estado IN ('GARANTIA', 'REVISION')
+LIMIT 5;
+
+-- Listado de clientes entre 18 y 25 años en las sedes especificadas
+SELECT c.NombreCliente, c.Edad, s.NombreSede
+FROM Cliente c
+JOIN Venta v ON c.IdCliente = v.IdCliente
+JOIN Sede s ON v.IdSede = s.IdSede
+WHERE c.Edad BETWEEN 18 AND 25
+AND s.NombreSede IN ('La Candelaria Norte', 'La Candelaria Este', 'Los 2 Caminos');
